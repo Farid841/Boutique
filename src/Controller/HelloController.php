@@ -2,33 +2,46 @@
 
 namespace App\Controller;
 
+use Symfony\Component\DependencyInjection\Loader\ProtectedPhpFileLoader;
 use Twig\Environment;
-use App\Taxes\Calculator;
-use Cocur\Slugify\Slugify;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 class HelloController
 {
-
+    protected $twig;
+    public function __construct(Environment $twig)
+    {
+        $this->twig = $twig;
+    }
     /**
-     * @Route("/Hello/{param}", name="Hello", methods={"GET"}, host="localhost", schemes={"http","https"})
+     * @Route("/Hello/{prenom}", name="Hello", methods={"GET"}, host="localhost", schemes={"http","https"})
      */
 
-    public function hello_word($param = "World", Calculator $calculator, LoggerInterface $Logger, Slugify $slugify, Environment $twig)
+    public function hello_word($prenom = "World")
     {
-        dump($twig);
-
-        dump($slugify->slugify("Hello Word"));
-
-        $Logger->error("mon message de log !");
-
-        $tva = $calculator->calcul(100);
-        dump($tva);
+        $html = $this->twig->render("hello.html.twig", [
+            'prenom' => $prenom,
+        ]);
+        return new Response($html);
+    }
 
 
-        return new Response("Hello $param");
+
+
+    /**
+     * @Route("/example", name="example")
+     */
+    public function example()
+    {
+        return $this->render();
+    }
+
+    protected function render()
+    {
+        $html = $this->twig->render("example.html.twig", [
+            'age' => 22
+        ]);
+        return new Response($html);
     }
 }

@@ -1,0 +1,81 @@
+warning: LF will be replaced by CRLF in config/services.yaml.
+The file will have its original line endings in your working directory
+[1mdiff --git a/config/services.yaml b/config/services.yaml[m
+[1mindex 3d1a5af..33d7fd6 100644[m
+[1m--- a/config/services.yaml[m
+[1m+++ b/config/services.yaml[m
+[36m@@ -32,4 +32,8 @@[m [mservices:[m
+     App\Taxes\Calculator:[m
+         arguments:[m
+             $tva: 20  [m
+[31m-    Cocur\Slugify\Slugify: ~       [m
+[32m+[m[32m    Cocur\Slugify\Slugify: ~[m[41m [m
+[32m+[m[41m   [m
+[32m+[m[32m    App\Taxes\Detector:[m
+[32m+[m[32m        arguments:[m
+[32m+[m[32m            $seuil: 100[m
+\ No newline at end of file[m
+[1mdiff --git a/src/Controller/HelloController.php b/src/Controller/HelloController.php[m
+[1mindex 306bad2..740f2e0 100644[m
+[1m--- a/src/Controller/HelloController.php[m
+[1m+++ b/src/Controller/HelloController.php[m
+[36m@@ -2,33 +2,46 @@[m
+ [m
+ namespace App\Controller;[m
+ [m
+[32m+[m[32muse Symfony\Component\DependencyInjection\Loader\ProtectedPhpFileLoader;[m
+ use Twig\Environment;[m
+[31m-use App\Taxes\Calculator;[m
+[31m-use Cocur\Slugify\Slugify;[m
+[31m-use Psr\Log\LoggerInterface;[m
+ use Symfony\Component\HttpFoundation\Response;[m
+ use Symfony\Component\Routing\Annotation\Route;[m
+ [m
+[31m-[m
+ class HelloController[m
+ {[m
+[31m-[m
+[32m+[m[32m    protected $twig;[m
+[32m+[m[32m    public function __construct(Environment $twig)[m
+[32m+[m[32m    {[m
+[32m+[m[32m        $this->twig = $twig;[m
+[32m+[m[32m    }[m
+     /**[m
+[31m-     * @Route("/Hello/{param}", name="Hello", methods={"GET"}, host="localhost", schemes={"http","https"})[m
+[32m+[m[32m     * @Route("/Hello/{prenom}", name="Hello", methods={"GET"}, host="localhost", schemes={"http","https"})[m
+      */[m
+ [m
+[31m-    public function hello_word($param = "World", Calculator $calculator, LoggerInterface $Logger, Slugify $slugify, Environment $twig)[m
+[32m+[m[32m    public function hello_word($prenom = "World")[m
+     {[m
+[31m-        dump($twig);[m
+[32m+[m[32m        $html = $this->twig->render("hello.html.twig", [[m
+[32m+[m[32m            'prenom' => $prenom,[m
+[32m+[m[32m        ]);[m
+[32m+[m[32m        return new Response($html);[m
+[32m+[m[32m    }[m
+ [m
+[31m-        dump($slugify->slugify("Hello Word"));[m
+ [m
+[31m-        $Logger->error("mon message de log !");[m
+ [m
+[31m-        $tva = $calculator->calcul(100);[m
+[31m-        dump($tva);[m
+ [m
+[32m+[m[32m    /**[m
+[32m+[m[32m     * @Route("/example", name="example")[m
+[32m+[m[32m     */[m
+[32m+[m[32m    public function example()[m
+[32m+[m[32m    {[m
+[32m+[m[32m        return $this->render();[m
+[32m+[m[32m    }[m
+ [m
+[31m-        return new Response("Hello $param");[m
+[32m+[m[32m    protected function render()[m
+[32m+[m[32m    {[m
+[32m+[m[32m        $html = $this->twig->render("example.html.twig", [[m
+[32m+[m[32m            'age' => 22[m
+[32m+[m[32m        ]);[m
+[32m+[m[32m        return new Response($html);[m
+     }[m
+ }[m
